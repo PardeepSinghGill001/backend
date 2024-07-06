@@ -7,6 +7,9 @@ const asyncHandler=(requestHandler) => {
 
 export {asyncHandler}
 
+// asyncHandler is a helper function that makes it easier to handle errors in asynchronous routes.
+// It wraps your route handler, ensuring that any errors are caught and passed to the next middleware, keeping your code clean and avoiding repetitive try-catch blocks.
+
 
 //requestHandler is analogous to fn
 /*const asyncHandler = (fn) =>: This defines a constant asyncHandler which is assigned to an arrow function. This arrow function takes a single parameter fn, which is expected to be a function.
