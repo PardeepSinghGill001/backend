@@ -17,5 +17,15 @@ app.use(express.urlencoded({extended:true,limit:"16kb"}))
 app.use(express.static("public"))
 app.use(cookieParser())//cookieParser can be used to perform CRUD operation on user cookies. A way by which secure cookies are placed in the browser only by the server so only server can read or remove those cookies.
 
+//Router import
+
+import userRouter from './routes/user.routes.js'
+//routes declaration
+//previously app.get was working because we were writing routes and controllers here using app
+//since, now the router is seperate so we have to use a middleware to bring in router
+//therefore, we write app.use
+app.use("/api/v1/users",userRouter)//if user goes to /users , the control is given to userRouter, userRouter will go to user.router file and ask to which route is the user to be taken
+//generated url will look somewhat like: http://localhost:8000/api/v1/users/register
+
 
 export  {app}
