@@ -1,4 +1,3 @@
-# backend all around
-This is a learning journey of backend with javascript.
+# backend of an E-learning platform.
 
 
