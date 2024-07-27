@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { registerUser, loginUser, logoutUser } from "../controllers/user.controllers.js";
+import { registerUser, loginUser, logoutUser,refreshAccessToken} from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middlewares.js";
 
 import {verifyJWT} from "../middlewares/auth.middlewares.js";
@@ -24,4 +24,5 @@ router.route("/register").post(
     //secured routes
     router.route("/logout").post(verifyJWT, logoutUser)
 //  generated url will look somewhat like: http://localhost:8000/users/register
+    router.route("/refresh-token").post(refreshAccessToken)
 export default router

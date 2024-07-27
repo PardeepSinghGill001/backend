@@ -49,6 +49,8 @@ const userSchema = new Schema(
 
     //arrow function does not have rference of this i.e, we do not know the context and save is to be performed on the schema so context  is necessary so do not use arrow function
 
+    //direct encryption is not possible so we use some mongoose hooks. 
+
     userSchema.pre("save", async function(next){
         if(!this.isModified("password")) return next();
 
@@ -61,7 +63,7 @@ const userSchema = new Schema(
     }
 
     userSchema.methods.generateAccessToken = function(){
-        jwt.sign(
+        return jwt.sign(
             {
                 _id:this._id,
                 email:this.email,
@@ -72,10 +74,10 @@ const userSchema = new Schema(
             {
                 expiresIn: process.env.ACCESS_TOKEN_EXPIRY
             }
-        )
-    }
+        );
+    };
     userSchema.methods.generateRefreshToken = function(){ 
-        jwt.sign(
+        return jwt.sign(
         {
             _id:this._id,
             

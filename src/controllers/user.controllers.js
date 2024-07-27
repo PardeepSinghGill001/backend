@@ -3,6 +3,8 @@ import {ApiError} from "../utils/ApiError.js";
 import {User} from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import jwt from "jsonwebtoken";
+
 const generateAccessandRefreshTokens=async(userId) => {
     try {
         const user = await User.findById(userId)
@@ -46,8 +48,8 @@ const registerUser = asyncHandler( async (req,res) => {
    if(existedUser){
     throw new ApiError(409,"User with email or username already exists")
    }
-   console.log(req.files);
-   const avatarLocalPath=req.files?.avatar[0]?.path;//getting the path to which multer stored the file on our server
+   //console.log(req.files);
+   const avatarLocalPath=req.files?.avatar[0]?.path;//getting the path to where multer stored the file on our server
 //    const coverImageLocalPath=req.files?.coverImage[0]?.path; 
 
    let coverImageLocalPath;
@@ -65,7 +67,7 @@ const registerUser = asyncHandler( async (req,res) => {
    const coverImage=await uploadOnCloudinary(coverImageLocalPath)
 
    if(!avatar){
-    throw new ApiError(400, "Avatar file is required")
+    throw new ApiError(400, "upload nhi hua")
    }
 
    const user =await User.create({
@@ -148,7 +150,7 @@ const logoutUser = asyncHandler( async (req,res) => {
     req.user._id,
     {
         $unset: {
-            refreshToken:1
+            refreshToken:undefined
         }
         //set operator gives us an object to which we insert the fields we want to update and set does it
     },
@@ -169,7 +171,48 @@ return res
 .json(new ApiResponse(200, {},"User logged Out"))
 }) 
 
+const refreshAccessToken=asyncHandler( async (req,res) => {
+    const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
+
+    if(!incomingRefreshToken){
+        throw new ApiError(401,"Unauthorized request");
+    }
+    try {
+        const decodedToken =jwt.verify(incomingRefreshToken,process.env.REFRESH_TOKEN_SECRET)
+        const user = await User.findById(decodedToken?._id)
+        if(!user){
+            throw new ApiError(401,"Invalid refresh token")
+        }
+        if(incomingRefreshToken!==user?.refreshToken){
+            throw new ApiError(401,"Refresh token is expired or used")
+        }
+        const options={
+            httpOnly:true,
+            secure:true
+        }
+        const {accessToken,newRefreshToken}=await generateAccessandRefreshTokens(user._id)
+        return res
+        .status(200)
+        .cookie("accessToken",accessToken,options)
+        .cookie("refreshToken",newRefreshToken,options)
+        .json(
+            new ApiResponse(
+                200,
+                {accessToken,refreshToken:newRefreshToken},
+                "Access token refreshed"
+            )
+        
+        )
+    } catch (error) {
+        throw new ApiError(401,error?.message || "Invalid refresh token")
+    }
+
+
+})
+
+
 export {registerUser,
         loginUser,
-        logoutUser
+        logoutUser,
+        refreshAccessToken
 }

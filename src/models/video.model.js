@@ -11,15 +11,16 @@ const videoSchema = new Schema(
             required:true,
         },
         title:{
-            type:String,//cloudinary url
+            type:String,
             required:true,
         },
         description:{
-            type:String,//cloudinary url
+            type:String,
             required:true,
         },
         duration:{
-            type:Number,//cloudinary url
+            type:Number,//cloudinary shares meta data about data once it stores it
+            //from there we get duration of video.
             required:true,
         },
         views:{
@@ -41,6 +42,6 @@ videoSchema.plugin(mongooseAggregatePaginate)
 //mongoose allows use to add our our plugins
 //this aggreagte framework came into mongodb recently
 //we add it as a plugin
-//now, we can aggregation queries also (regular queries were possible even without it)
+//now, we can write aggregation queries also (regular queries were possible even without it)
 //this aggregation pipeline of mongoose will take our project to advance level
 export const Video = mongoose.model("Video",videoSchema);
